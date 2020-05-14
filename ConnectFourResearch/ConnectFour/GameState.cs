@@ -22,11 +22,23 @@ namespace ConnectFourResearch.ConnectFour
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Получить список возможных столбцов для выставления фишки
+        /// </summary>
+        /// <returns>номера незаполненных столбцов</returns>
+        /// <exception cref="NotImplementedException"></exception>
         public IEnumerable<int> GetPossibleMoves()
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Получить количество линий определенной длины для определенного цвета
+        /// </summary>
+        /// <param name="length">длина линий (от 2 до 4)</param>
+        /// <param name="player">цвет фишек</param>
+        /// <returns>количество таких линий</returns>
+        /// <exception cref="NotImplementedException"></exception>
         public int GetLinesCountOfLength(int length, CellState player)
         {
             throw new NotImplementedException();
