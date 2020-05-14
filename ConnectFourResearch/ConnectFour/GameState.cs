@@ -25,7 +25,7 @@ namespace ConnectFourResearch.ConnectFour
         /// <summary>
         /// Получить список возможных столбцов для выставления фишки
         /// </summary>
-        /// <returns>номера незаполненных столбцов</returns>
+        /// <returns>Номера незаполненных столбцов</returns>
         /// <exception cref="NotImplementedException"></exception>
         public IEnumerable<int> GetPossibleMoves()
         {
@@ -35,9 +35,9 @@ namespace ConnectFourResearch.ConnectFour
         /// <summary>
         /// Получить количество линий определенной длины для определенного цвета
         /// </summary>
-        /// <param name="length">длина линий (от 2 до 4)</param>
-        /// <param name="player">цвет фишек</param>
-        /// <returns>количество таких линий</returns>
+        /// <param name="length">Длина линий (от 2 до 4)</param>
+        /// <param name="player">Цвет фишек</param>
+        /// <returns>Количество таких линий</returns>
         /// <exception cref="NotImplementedException"></exception>
         public int GetLinesCountOfLength(int length, CellState player)
         {
