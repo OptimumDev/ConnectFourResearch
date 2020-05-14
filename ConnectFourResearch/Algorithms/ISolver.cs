@@ -2,11 +2,6 @@ using System.Collections.Generic;
 
 namespace ConnectFourResearch.Algorithms
 {
-    public interface ISolution
-    {
-        double Score { get; }
-    }
-
     public interface ISolver<in TProblem, out TSolution> where TSolution : ISolution
     {
         /// <param name="problem">problem to solve</param>
