@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ConnectFourResearch.ConnectFour
 {
-    public class GameState
+    public class Board
     {
         public const int Width = 7;
         public const int Height = 6;
@@ -11,13 +11,13 @@ namespace ConnectFourResearch.ConnectFour
         private ulong redPositions;
         private ulong yellowPositions;
 
-        public GameState() {}
+        public Board() {}
 
-        private GameState(ulong redPositions, ulong yellowPositions, int hash)
+        private Board(ulong redPositions, ulong yellowPositions, int hash)
         {
         }
 
-        public GameState Move(int column, CellState player)
+        public Board Move(int column, Cell player)
         {
             throw new NotImplementedException();
         }
@@ -39,12 +39,17 @@ namespace ConnectFourResearch.ConnectFour
         /// <param name="player">Цвет фишек</param>
         /// <returns>Количество таких линий</returns>
         /// <exception cref="NotImplementedException"></exception>
-        public int GetLinesCountOfLength(int length, CellState player)
+        public int GetLinesCountOfLength(int length, Cell player)
         {
             throw new NotImplementedException();
         }
 
         public bool IsFinished()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Cell GetCell(int x, int y)
         {
             throw new NotImplementedException();
         }
