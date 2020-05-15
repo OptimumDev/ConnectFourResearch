@@ -8,7 +8,8 @@ namespace ConnectFourResearch.Algorithms
 {
     public class UniversalBoardLogger : IBoardLogger
     {
-        private static string lineDivider = $"|{Enumerable.Repeat("---|", Board.Width).StrJoin()}\n";
+        private static readonly string LineDivider =
+            $"|{Enumerable.Repeat("---|", Board.Width).StrJoin()}\n";
 
         private readonly Action<string> logAction;
         private readonly Dictionary<Cell, Action<string>> colorLogActions;
@@ -39,6 +40,7 @@ namespace ConnectFourResearch.Algorithms
 
                 isBest = false;
             }
+
             LogBoard(board);
             logAction("\n");
         }
@@ -47,7 +49,7 @@ namespace ConnectFourResearch.Algorithms
 
         private void LogBoard(Board board)
         {
-            logAction(lineDivider);
+            logAction(LineDivider);
             for (var y = 0; y < Board.Height; y++)
             {
                 logAction("|");
@@ -58,7 +60,8 @@ namespace ConnectFourResearch.Algorithms
                     logAction("|\n");
                 }
             }
-            logAction(lineDivider);
+
+            logAction(LineDivider);
         }
 
         private static string CellToString(Cell cell) => cell switch
