@@ -16,6 +16,11 @@ namespace ConnectFourResearch.Extensions
         {
             return items.Select(toString).StrJoin(delimiter);
         }
+
+        public static string StrJoin<T>(this IEnumerable<T> items)
+        {
+            return string.Join("", items);
+        }
         
         public static int ToInt(this string s)
         {
