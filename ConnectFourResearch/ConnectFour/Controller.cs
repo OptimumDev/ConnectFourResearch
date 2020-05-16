@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using ConnectFourResearch.Algorithms;
+using ConnectFourResearch.Logging;
 
 namespace ConnectFourResearch.ConnectFour
 {

@@ -4,7 +4,7 @@ using System.Linq;
 using ConnectFourResearch.ConnectFour;
 using ConnectFourResearch.Extensions;
 
-namespace ConnectFourResearch.Algorithms
+namespace ConnectFourResearch.Logging
 {
     public class UniversalBoardLogger : IBoardLogger
     {
@@ -56,8 +56,9 @@ namespace ConnectFourResearch.Algorithms
                 for (var x = 0; x < Board.Width; x++)
                 {
                     var cell = board.GetCell(x, y);
-                    colorLogActions[cell]($" {CellToString(cell)} ");
-                    logAction("|\n");
+                    logAction(" ");
+                    colorLogActions[cell]($"{CellToString(cell)}");
+                    logAction(" |\n");
                 }
             }
 

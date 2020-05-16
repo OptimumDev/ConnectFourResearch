@@ -1,6 +1,6 @@
 using System;
 
-namespace ConnectFourResearch.Algorithms
+namespace ConnectFourResearch.Logging
 {
     public class ConsoleBoardLogger : UniversalBoardLogger
     {

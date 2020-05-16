@@ -1,20 +1,16 @@
-using System;
 using System.IO;
 
-namespace ConnectFourResearch.Algorithms
+namespace ConnectFourResearch.Logging
 {
     public class FileBoardLogger : UniversalBoardLogger
     {
         public FileBoardLogger(string filePath) : base(
-            GetLogAction(filePath),
-            GetLogAction(filePath),
-            GetLogAction(filePath)
+            s => File.AppendAllText(filePath, s),
+            _ => File.AppendAllText(filePath, "Y"),
+            _ => File.AppendAllText(filePath, "R")
         )
         {
             File.Create(filePath);
         }
-
-        private static Action<string> GetLogAction(string filePath) => str =>
-            File.AppendAllText(filePath, str);
     }
 }

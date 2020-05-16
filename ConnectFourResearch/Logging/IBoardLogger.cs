@@ -1,8 +1,7 @@
-using System.Collections;
 using System.Collections.Generic;
 using ConnectFourResearch.ConnectFour;
 
-namespace ConnectFourResearch.Algorithms
+namespace ConnectFourResearch.Logging
 {
     public interface IBoardLogger
     {
