@@ -14,7 +14,7 @@ namespace ConnectFourResearch.Logging
         private readonly Action<string> logAction;
         private readonly Dictionary<Cell, Action<string>> colorLogActions;
 
-        public UniversalBoardLogger(Action<string> logAction,
+        protected UniversalBoardLogger(Action<string> logAction,
             Action<string> logYellowAction, Action<string> logRedAction)
         {
             this.logAction = logAction;
@@ -47,7 +47,7 @@ namespace ConnectFourResearch.Logging
 
         private static string MoveToString(Move move) => $"{move.Column} : {move.Score}";
 
-        private void LogBoard(Board board)
+        public void LogBoard(Board board)
         {
             logAction(LineDivider);
             for (var y = 0; y < Board.Height; y++)
