@@ -17,10 +17,12 @@ namespace ConnectFourResearch.ConnectFour
         private const ulong Top = Bottom << (Height - 1);
 
         private static readonly byte[] DirectionOffsets = {1, 6, 7, 8};
+        private static readonly int[,] ZobristHashTable = CreateZobristHashTable();
 
         private readonly ulong _redPositions;
         private readonly ulong _yellowPositions;
         private readonly byte[] _heights;
+        private readonly int _hash;
 
         public Board() : this(0UL, 0UL, CreateHeights())
         {
@@ -31,6 +33,24 @@ namespace ConnectFourResearch.ConnectFour
             _redPositions = redPositions;
             _yellowPositions = yellowPositions;
             _heights = heights;
+            _hash = hash;
+        }
+
+        public override int GetHashCode() => _hash;
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (GetType() != obj.GetType()) return false;
+            return Equals((Board) obj);
+        }
+
+        private bool Equals(Board other)
+        {
+            return _redPositions == other._redPositions &&
+                   _yellowPositions == other._yellowPositions &&
+                   _heights.Equals(other._heights);
         }
 
         public Board Move(int column, Cell player)
@@ -38,10 +58,11 @@ namespace ConnectFourResearch.ConnectFour
             var heights = new byte[_heights.Length];
             Array.Copy(_heights, heights, _heights.Length);
             var position = 1UL << heights[column]++;
+            var hash = CalculateNextStateHash(column, player);
             return player switch
             {
-                Cell.Red => new Board(_redPositions ^ position, _yellowPositions, heights),
-                Cell.Yellow => new Board(_redPositions, _yellowPositions ^ position, heights),
+                Cell.Red => new Board(_redPositions ^ position, _yellowPositions, heights, hash),
+                Cell.Yellow => new Board(_redPositions, _yellowPositions ^ position, heights, hash),
                 _ => throw new ArgumentException($"A player can not be {player}")
             };
         }
@@ -98,7 +119,12 @@ namespace ConnectFourResearch.ConnectFour
             return Cell.Empty;
         }
 
-        private bool IsColumnFull(int column) => (Top & (1UL << _heights[column])) == 1;
+        private int CalculateNextStateHash(int column, Cell cell)
+        {
+            return _hash ^ ZobristHashTable[_heights[column], (int) cell];
+        }
+
+        private bool IsColumnFull(int column) => IsTopRow(_heights[column]);
 
         private ulong GetPlayerPositions(Cell player) => player switch
         {
@@ -106,6 +132,26 @@ namespace ConnectFourResearch.ConnectFour
             Cell.Yellow => _yellowPositions,
             _ => throw new ArgumentException($"A player can not be {player}")
         };
+
+        private static int[,] CreateZobristHashTable()
+        {
+            var random = new Random();
+            var cellTypes = Enum.GetValues(typeof(Cell));
+            var table = new int[Size, cellTypes.Length];
+            foreach (var j in cellTypes.Cast<int>())
+            {
+                for (var i = 0; i < Size; i++)
+                {
+                    table[i, j] = random.Next();
+                    // skip additional row
+                    if (IsTopRow(i)) i++;
+                }
+            }
+
+            return table;
+        }
+
+        private static bool IsTopRow(int index) => (Top & (1UL << index)) == 1;
 
         private static byte[] CreateHeights() => Enumerable.Range(0, Width)
             .Select(i => (byte) (i * Height1))
