@@ -157,6 +157,6 @@ namespace ConnectFourResearch.ConnectFour
             .Select(i => (byte) (i * Height1))
             .ToArray();
 
-        private static bool IsSet(ulong positions, int x, int y) => positions >> (y + x * Height1) == 1;
+        private static bool IsSet(ulong positions, int x, int y) => ((positions >> (y + x * Height1)) & 1) == 1;
     }
 }
