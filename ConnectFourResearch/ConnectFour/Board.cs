@@ -143,9 +143,9 @@ namespace ConnectFourResearch.ConnectFour
             {
                 for (var i = 0; i < Size; i++)
                 {
+                    if (IsTopRow(i))
+                        continue;
                     table[i, j] = random.Next();
-                    // skip additional row
-                    if (IsTopRow(i)) i++;
                 }
             }
 
