@@ -9,12 +9,13 @@ namespace ConnectFourResearch.ConnectFour
     {
         public const int Width = 7;
         public const int Height = 6;
+
         private const int Height1 = Height + 1;
         private const int Size = Width * Height1;
         private const ulong All = (1UL << Size) - 1;
         private const ulong Column = (1UL << Height1) - 1;
         private const ulong Bottom = All / Column;
-        private const ulong Top = Bottom << (Height - 1);
+        private const ulong Top = Bottom << Height;
 
         private static readonly byte[] DirectionOffsets = {1, 6, 7, 8};
         private static readonly int[,] ZobristHashTable = CreateZobristHashTable();
@@ -151,7 +152,7 @@ namespace ConnectFourResearch.ConnectFour
             return table;
         }
 
-        private static bool IsTopRow(int index) => (Top & (1UL << index)) == 1;
+        private static bool IsTopRow(int index) => (Top & (1UL << index)) != 0;
 
         private static byte[] CreateHeights() => Enumerable.Range(0, Width)
             .Select(i => (byte) (i * Height1))
