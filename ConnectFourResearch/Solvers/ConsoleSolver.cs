@@ -12,11 +12,12 @@ namespace ConnectFourResearch.Solvers
 
         public IEnumerable<Move> GetSolutions(Board problem, Countdown countdown)
         {
+            Console.Clear();
             logger.LogBoard(problem);
             Console.Write("|");
             for (var i = 0; i < Board.Width; i++)
                 Console.Write($" {i + 1} |");
-            Console.WriteLine("\n");
+            Console.WriteLine();
 
             Console.WriteLine("Choose column to place disk (Use number keys)");
             ConsoleKeyInfo key;
@@ -24,8 +25,8 @@ namespace ConnectFourResearch.Solvers
             {
                 key = Console.ReadKey();
             } while (!char.IsDigit(key.KeyChar));
-
-            yield return new Move(int.Parse(key.KeyChar.ToString()), 0);
+            Console.WriteLine("\n");
+            yield return new Move(int.Parse(key.KeyChar.ToString()) - 1, 0);
         }
     }
 }

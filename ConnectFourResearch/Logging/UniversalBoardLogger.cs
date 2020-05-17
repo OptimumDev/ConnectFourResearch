@@ -22,7 +22,8 @@ namespace ConnectFourResearch.Logging
             colorLogActions = new Dictionary<Cell, Action<string>>
             {
                 [Cell.Yellow] = logYellowAction,
-                [Cell.Red] = logRedAction
+                [Cell.Red] = logRedAction,
+                [Cell.Empty] = logAction
             };
         }
 
@@ -30,8 +31,7 @@ namespace ConnectFourResearch.Logging
         {
             var isBest = true;
 
-            colorLogActions[player](player.ToString());
-            logAction(" player's turn!\nMove variants:\n");
+            logAction($"{player} player's turn!\nMove variants:\n");
             foreach (var move in moveVariants)
             {
                 var logMoveAction = isBest ? colorLogActions[player] : logAction;
@@ -50,7 +50,7 @@ namespace ConnectFourResearch.Logging
         public void LogBoard(Board board)
         {
             logAction(LineDivider);
-            for (var y = 0; y < Board.Height; y++)
+            for (var y = Board.Height - 1; y >= 0; y--)
             {
                 logAction("|");
                 for (var x = 0; x < Board.Width; x++)
@@ -58,8 +58,10 @@ namespace ConnectFourResearch.Logging
                     var cell = board.GetCell(x, y);
                     logAction(" ");
                     colorLogActions[cell]($"{CellToString(cell)}");
-                    logAction(" |\n");
+                    logAction(" |");
                 }
+
+                logAction("\n");
             }
 
             logAction(LineDivider);
