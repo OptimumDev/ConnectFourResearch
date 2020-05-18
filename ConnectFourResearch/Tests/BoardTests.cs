@@ -21,7 +21,8 @@ namespace ConnectFourResearch.Tests
         }
 
         [Test]
-        public void GetCell_ReturnsRightPlayer_WhenHasDisks([Values(Cell.Yellow, Cell.Red)] Cell player)
+        public void GetCell_ReturnsRightPlayer_WhenHasDisks(
+            [Values(Cell.Yellow, Cell.Red)] Cell player)
         {
             var game = board;
 
@@ -31,7 +32,8 @@ namespace ConnectFourResearch.Tests
         }
 
         [Test]
-        public void GetCell_ReturnsAllPlayersDisks_WhenHasMoreThanOneDisk([Values(Cell.Yellow, Cell.Red)] Cell player)
+        public void GetCell_ReturnsAllPlayersDisks_WhenHasMoreThanOneDisk(
+            [Values(Cell.Yellow, Cell.Red)] Cell player)
         {
             var game = board;
 
@@ -51,7 +53,7 @@ namespace ConnectFourResearch.Tests
         [Test]
         public void Move_PlacesDisk_InRightColumn(
             [Values(Cell.Yellow, Cell.Red)] Cell player,
-            [Range(0, 6)] int column)
+            [Range(0, Board.Width - 1)] int column)
         {
             var game = board;
 
@@ -61,7 +63,8 @@ namespace ConnectFourResearch.Tests
         }
 
         [Test]
-        public void Move_PlacesDisk_InFirstEmptyRow([Values(Cell.Yellow, Cell.Red)] Cell player)
+        public void Move_PlacesDisk_InFirstEmptyRow(
+            [Values(Cell.Yellow, Cell.Red)] Cell player)
         {
             var game = board;
 
@@ -162,7 +165,8 @@ namespace ConnectFourResearch.Tests
         }
 
         [Test]
-        public void CanWinWithVertical([Values(Cell.Yellow, Cell.Red)] Cell player)
+        public void CanWinWithVertical(
+            [Values(Cell.Yellow, Cell.Red)] Cell player)
         {
             var game = board;
 
@@ -172,7 +176,8 @@ namespace ConnectFourResearch.Tests
         }
 
         [Test]
-        public void CanWinWithHorizontal([Values(Cell.Yellow, Cell.Red)] Cell player)
+        public void CanWinWithHorizontal(
+            [Values(Cell.Yellow, Cell.Red)] Cell player)
         {
             var game = board;
 
@@ -182,7 +187,8 @@ namespace ConnectFourResearch.Tests
         }
 
         [Test]
-        public void CanWinWithMainDiagonal([Values(Cell.Yellow, Cell.Red)] Cell player)
+        public void CanWinWithMainDiagonal(
+            [Values(Cell.Yellow, Cell.Red)] Cell player)
         {
             var game = board;
 
@@ -192,7 +198,8 @@ namespace ConnectFourResearch.Tests
         }
 
         [Test]
-        public void CanWinWithAntiDiagonal([Values(Cell.Yellow, Cell.Red)] Cell player)
+        public void CanWinWithAntiDiagonal(
+            [Values(Cell.Yellow, Cell.Red)] Cell player)
         {
             var game = board;
 
@@ -216,7 +223,8 @@ namespace ConnectFourResearch.Tests
         [Test]
         public void GetPossibleMoves_ReturnsAllPossibleColumns_WhenEmpty()
         {
-            board.GetPossibleMoves().Should().BeEquivalentTo(Enumerable.Range(0, 7));
+            var expected = Enumerable.Range(0, Board.Width);
+            board.GetPossibleMoves().Should().BeEquivalentTo(expected);
         }
 
         [Test]
@@ -227,31 +235,36 @@ namespace ConnectFourResearch.Tests
             game = game.Move(0, Cell.Yellow);
             game = game.Move(4, Cell.Red);
 
-            game.GetPossibleMoves().Should().BeEquivalentTo(Enumerable.Range(0, 7));
+            var expected = Enumerable.Range(0, Board.Width);
+            game.GetPossibleMoves().Should().BeEquivalentTo(expected);
         }
 
         [Test]
-        public void GetPossibleMoves_ReturnsOnlyPossibleColumns_WhenHasOneFullColumn([Range(0, 6)] int column)
+        public void GetPossibleMoves_ReturnsOnlyPossibleColumns_WhenHasOneFullColumn(
+            [Range(0, Board.Width - 1)] int column)
         {
             var game = board;
 
             game = FillColumn(column, game);
 
-            var expected = Enumerable.Range(0, 7).Where(c => c != column);
+            var expected = Enumerable
+                .Range(0, Board.Width)
+                .Where(c => c != column);
             game.GetPossibleMoves().Should().BeEquivalentTo(expected);
         }
 
         [Test]
-        public void GetPossibleMoves_ReturnsOnlyPossibleColumns_WhenHasMoreThanOneFullColumn([Range(0, 6)] int column)
+        public void GetPossibleMoves_ReturnsOnlyPossibleColumns_WhenHasMoreThanOneFullColumn(
+            [Range(0, Board.Width - 1)] int column)
         {
             var game = board;
-            var secondColumn = (column + 2) % 7;
+            var secondColumn = (column + 2) % Board.Width;
 
             game = FillColumn(column, game);
             game = FillColumn(secondColumn, game);
 
             var expected = Enumerable
-                .Range(0, 7)
+                .Range(0, Board.Width)
                 .Where(c => c != column && c != secondColumn);
             game.GetPossibleMoves().Should().BeEquivalentTo(expected);
         }
@@ -309,8 +322,8 @@ namespace ConnectFourResearch.Tests
         {
             for (var i = 0; i < 10; i++)
             {
-                var yColumn = i * 2 % 7;
-                var rColumn = (i * 2 + 1) % 7;
+                var yColumn = i * 2 % Board.Width;
+                var rColumn = (i * 2 + 1) % Board.Width;
                 for (var j = 0; j < 2; j++)
                 {
                     game = game.Move(yColumn, Cell.Yellow);
