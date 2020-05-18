@@ -12,21 +12,38 @@ namespace ConnectFourResearch.Solvers
 
         public IEnumerable<Move> GetSolutions(Board problem, Countdown countdown)
         {
+            var moves = new HashSet<int>(problem.GetPossibleMoves());
+
             Console.Clear();
             logger.LogBoard(problem);
-            Console.Write("|");
-            for (var i = 0; i < Board.Width; i++)
-                Console.Write($" {i + 1} |");
-            Console.WriteLine();
-
+            PrintMoves(moves);
             Console.WriteLine("Choose column to place disk (Use number keys)");
-            ConsoleKeyInfo key;
+            var column = GetColumn(moves);
+            Console.WriteLine("\n");
+
+            yield return new Move(column, 0);
+        }
+
+        private static int GetColumn(HashSet<int> moves)
+        {
+            int column;
+            bool isDigit;
             do
             {
-                key = Console.ReadKey();
-            } while (!char.IsDigit(key.KeyChar));
-            Console.WriteLine("\n");
-            yield return new Move(int.Parse(key.KeyChar.ToString()) - 1, 0);
+                Console.Write("\r");
+                var key = Console.ReadKey();
+                isDigit = int.TryParse(key.KeyChar.ToString(), out column);
+            } while (!isDigit || !moves.Contains(column - 1));
+
+            return column - 1;
+        }
+
+        private static void PrintMoves(HashSet<int> moves)
+        {
+            Console.Write("|");
+            for (var i = 0; i < Board.Width; i++)
+                Console.Write($" {(moves.Contains(i) ? (i + 1).ToString() : " ")} |");
+            Console.WriteLine();
         }
     }
 }
