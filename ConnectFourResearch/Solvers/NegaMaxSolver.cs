@@ -40,6 +40,7 @@ namespace ConnectFourResearch.Solvers
             board.GetLinesCountOfLength(4, player.GetOpponent()) *
             1_000_000_000;
 
+        // Enumerable.Range(2, 3).Select(i => board.GetLinesCountOfLength(i, player) * Math.Pow(10, i)).Sum();
         private static double GetEstimateScore(Board board, Cell player) =>
             board.GetLinesCountOfLength(4, player) * 100000 +
             board.GetLinesCountOfLength(3, player) * 1000 +
