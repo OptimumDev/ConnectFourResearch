@@ -24,8 +24,7 @@ namespace ConnectFourResearch.Solvers
         {
             return problem
                 .GetPossibleMoves()
-                .Select(move => new Move(move, -GetScore(problem.Move(move, player), player.GetOpponent(), depth)))
-                .OrderBy(m => m.Score);
+                .Select(move => new Move(move, -GetScore(problem.Move(move, player), player.GetOpponent(), depth)));
         }
 
         private double GetScore(Board board, Cell player, int depth) => (board.IsFinished(), depth) switch
