@@ -10,7 +10,7 @@ namespace ConnectFourResearch
         public static void Main()
         {
             var logger = new ConsoleBoardLogger();
-            var controller = new Controller(new ConsoleSolver(), new ConsoleSolver(), logger);
+            var controller = new Controller(new ConsoleSolver(), new NegaMaxSolver(Cell.Yellow), logger);
             var result = controller.Play();
 
             Console.Clear();
