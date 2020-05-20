@@ -28,23 +28,21 @@ namespace ConnectFourResearch.Solvers
                 .OrderBy(m => m.Score);
         }
 
-        private double GetScore(Board board, Cell player, int depth)
+        private double GetScore(Board board, Cell player, int depth) => (board.IsFinished(), depth) switch
         {
-            if (board.IsFinished())
-            {
-                if (board.GetLinesCountOfLength(4, player) > 1)
-                    return 1_000_000_000;
-                if (board.GetLinesCountOfLength(4, player.GetOpponent()) > 1)
-                    return -1_000_000_000;
-                return 0;
-            }
-            
-            if (depth == 0)
-                return board.GetLinesCountOfLength(4, player) * 100000 +
-                       board.GetLinesCountOfLength(3, player) * 1000 +
-                       board.GetLinesCountOfLength(2, player) * 100;
+            (true, _) => GetFinishScore(board, player),
+            (_, 0) => GetEstimateScore(board, player),
+            _ => Solve(board, player, depth - 1).Max(b => b.Score)
+        };
 
-            return Solve(board, player, depth - 1).Max(b => b.Score);
-        }
+        private static double GetFinishScore(Board board, Cell player) =>
+            board.GetLinesCountOfLength(4, player) -
+            board.GetLinesCountOfLength(4, player.GetOpponent()) *
+            1_000_000_000;
+
+        private static double GetEstimateScore(Board board, Cell player) =>
+            board.GetLinesCountOfLength(4, player) * 100000 +
+            board.GetLinesCountOfLength(3, player) * 1000 +
+            board.GetLinesCountOfLength(2, player) * 100;
     }
 }
