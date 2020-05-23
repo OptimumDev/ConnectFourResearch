@@ -11,13 +11,21 @@ namespace ConnectFourResearch
         public static void Main()
         {
             Console.OutputEncoding = Encoding.UTF8;
-
             var logger = new ConsoleBoardLogger();
-            var controller = new Controller(new MiniMaxSolver(Cell.Yellow), new NegaMaxSolver(Cell.Red), logger);
-            var result = controller.Play();
+
+            var yellowPlayer = new MiniMaxSolver(Cell.Yellow);
+            var redPlayer = new NegaMaxSolver(Cell.Red);
+            var controller = new Controller(yellowPlayer, redPlayer, logger);
+
+            var result = controller.Play(true);
 
             Console.Clear();
             logger.LogBoard(result);
+            PrintResult(result);
+        }
+
+        private static void PrintResult(Board result)
+        {
             if (result.GetLinesCountOfLength(4, Cell.Yellow) > 0)
                 Console.WriteLine("Yellow player won!");
             else if (result.GetLinesCountOfLength(4, Cell.Red) > 0)

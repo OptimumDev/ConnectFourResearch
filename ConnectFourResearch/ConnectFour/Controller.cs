@@ -30,9 +30,9 @@ namespace ConnectFourResearch.ConnectFour
             {
                 var moves = solvers[currentPlayer].GetSolutions(board, 100).ToList();
                 board = board.Move(moves[^1].Column, currentPlayer);
-                currentPlayer = currentPlayer.GetOpponent();
                 if (makeLog)
                     logger.Log(board, moves.Skip(moves.Count - 5).Reverse(), currentPlayer);
+                currentPlayer = currentPlayer.GetOpponent();
             }
 
             return board;
