@@ -16,7 +16,7 @@ namespace ConnectFourResearch.Solvers
 
             Console.Clear();
             logger.LogBoard(problem);
-            PrintMoves(moves);
+            logger.PrintMoves(moves);
             Console.WriteLine("Choose column to place disk (Use number keys)");
             var column = GetColumn(moves);
             Console.WriteLine("\n");
@@ -36,14 +36,6 @@ namespace ConnectFourResearch.Solvers
             } while (!isDigit || !moves.Contains(column - 1));
 
             return column - 1;
-        }
-
-        private static void PrintMoves(HashSet<int> moves)
-        {
-            Console.Write("|");
-            for (var i = 0; i < Board.Width; i++)
-                Console.Write($" {(moves.Contains(i) ? (i + 1).ToString() : " ")} |");
-            Console.WriteLine();
         }
     }
 }

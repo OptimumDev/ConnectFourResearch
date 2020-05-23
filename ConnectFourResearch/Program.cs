@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using ConnectFourResearch.ConnectFour;
 using ConnectFourResearch.Logging;
 using ConnectFourResearch.Solvers;
@@ -9,6 +10,8 @@ namespace ConnectFourResearch
     {
         public static void Main()
         {
+            Console.OutputEncoding = Encoding.UTF8;
+
             var logger = new ConsoleBoardLogger();
             var controller = new Controller(new ConsoleSolver(), new ConsoleSolver(), logger);
             var result = controller.Play();

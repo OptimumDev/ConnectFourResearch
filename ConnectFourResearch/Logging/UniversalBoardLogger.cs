@@ -8,8 +8,10 @@ namespace ConnectFourResearch.Logging
 {
     public class UniversalBoardLogger : IBoardLogger
     {
-        private static readonly string LineDivider =
-            $"|{Enumerable.Repeat("---|", Board.Width).StrJoin()}\n";
+        private static readonly string TopLine = GetBoardBoxLine('┌', '┬', '┐');
+        private static readonly string MiddleLine = GetBoardBoxLine('├', '┼', '┤');
+        private static readonly string BottomLine = GetBoardBoxLine('└', '┴', '┘');
+
 
         private readonly Action<string> logAction;
         private readonly Dictionary<Cell, Action<string>> colorLogActions;
@@ -34,9 +36,10 @@ namespace ConnectFourResearch.Logging
             logAction($"{player} player's turn!\nMove variants:\n");
             foreach (var move in moveVariants)
             {
-                var logMoveAction = isBest ? colorLogActions[player] : logAction;
-
-                logMoveAction($"\t{MoveToString(move)}\n");
+                logAction($"\t{MoveToString(move)}");
+                if (isBest)
+                    logAction(" (Best)");
+                logAction("\n");
 
                 isBest = false;
             }
@@ -45,26 +48,34 @@ namespace ConnectFourResearch.Logging
             logAction("\n");
         }
 
-        private static string MoveToString(Move move) => $"{move.Column} : {move.Score}";
+        private static string MoveToString(Move move) => $"{move.Column} : {move.Score:F}";
 
         public void LogBoard(Board board)
         {
-            logAction(LineDivider);
+            logAction(TopLine);
             for (var y = Board.Height - 1; y >= 0; y--)
             {
-                logAction("|");
+                logAction("│");
                 for (var x = 0; x < Board.Width; x++)
                 {
                     var cell = board.GetCell(x, y);
                     logAction(" ");
                     colorLogActions[cell]($"{CellToString(cell)}");
-                    logAction(" |");
+                    logAction(" │");
                 }
 
                 logAction("\n");
             }
 
-            logAction(LineDivider);
+            logAction(MiddleLine);
+        }
+
+        public void PrintMoves(HashSet<int> moves)
+        {
+            logAction("│");
+            for (var i = 0; i < Board.Width; i++)
+                logAction($" {(moves.Contains(i) ? (i + 1).ToString() : " ")} │");
+            logAction($"\n{BottomLine}");
         }
 
         private static string CellToString(Cell cell) => cell switch
@@ -74,5 +85,11 @@ namespace ConnectFourResearch.Logging
             Cell.Empty => " ",
             _ => throw new ArgumentOutOfRangeException(nameof(cell), cell, null)
         };
+
+        private static string GetBoardBoxLine(char startChar, char middleChar, char endChar)
+        {
+            var middle = Enumerable.Repeat($"───{middleChar}", Board.Width - 1).StrJoin();
+            return $"{startChar}{middle}───{endChar}\n";
+        }
     }
 }
