@@ -13,7 +13,7 @@ namespace ConnectFourResearch
             Console.OutputEncoding = Encoding.UTF8;
 
             var logger = new ConsoleBoardLogger();
-            var controller = new Controller(new ConsoleSolver(), new ConsoleSolver(), logger);
+            var controller = new Controller(new MiniMaxSolver(Cell.Yellow), new NegaMaxSolver(Cell.Red), logger);
             var result = controller.Play();
 
             Console.Clear();
