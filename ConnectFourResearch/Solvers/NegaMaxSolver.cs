@@ -19,8 +19,8 @@ namespace ConnectFourResearch.Solvers
         {
             return Solve(problem, me, defaultDepth).OrderBy(m => m.Score);
         }
-        
-        public IEnumerable<Move> Solve(Board problem, Cell player, int depth)
+
+        private IEnumerable<Move> Solve(Board problem, Cell player, int depth)
         {
             return problem
                 .GetPossibleMoves()
@@ -35,12 +35,15 @@ namespace ConnectFourResearch.Solvers
         };
 
         private static double GetFinishScore(Board board, Cell player) =>
-            board.GetLinesCountOfLength(4, player) -
-            board.GetLinesCountOfLength(4, player.GetOpponent()) *
+            (board.GetLinesCountOfLength(4, player) -
+            board.GetLinesCountOfLength(4, player.GetOpponent())) *
             1_000_000_000;
 
-        // Enumerable.Range(2, 3).Select(i => board.GetLinesCountOfLength(i, player) * Math.Pow(10, i)).Sum();
         private static double GetEstimateScore(Board board, Cell player) =>
+            GetPlayerEstimateScore(board, player) - GetPlayerEstimateScore(board, player.GetOpponent());
+
+        // Enumerable.Range(2, 3).Select(i => board.GetLinesCountOfLength(i, player) * Math.Pow(10, i)).Sum();
+        private static double GetPlayerEstimateScore(Board board, Cell player) =>
             board.GetLinesCountOfLength(4, player) * 100000 +
             board.GetLinesCountOfLength(3, player) * 1000 +
             board.GetLinesCountOfLength(2, player) * 100;
