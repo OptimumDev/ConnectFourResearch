@@ -10,8 +10,8 @@ namespace ConnectFourResearch.Solvers
     public class MiniMaxSolver : ISolver<Board, Move>
     {
         private readonly Cell maximazingPlayer;
-        private readonly int defaultDepth = 5;
         private bool withCache;
+        private Dictionary<Board, double> cache = new Dictionary<Board, double>();
 
         public MiniMaxSolver(Cell maximazingPlayer, bool withCache = false)
         {
@@ -21,16 +21,32 @@ namespace ConnectFourResearch.Solvers
 
         public IEnumerable<Move> GetSolutions(Board problem, Countdown countdown)
         {
-            return MiniMax(problem, maximazingPlayer, defaultDepth, double.NegativeInfinity, double.PositiveInfinity)
-                .OrderBy(m => m.Score);
+            IEnumerable<Move> result;
+            
+            var depth = 1;
+            do
+            {
+                // А нужно ли теперь Countdown прокидывать?
+                result = MiniMax(problem, maximazingPlayer, depth, double.NegativeInfinity, double.PositiveInfinity, countdown);
+                depth++;
+            } while (!countdown.IsFinished());
+            
+            return result.OrderBy(m => m.Score);
         }
 
-        private IEnumerable<Move> MiniMax(Board gameState, Cell player, int depth, double alpha, double beta)
+        private IEnumerable<Move> MiniMax(Board gameState, Cell player, int depth, double alpha, double beta, Countdown countdown)
         {
             foreach(var move in gameState.GetPossibleMoves())
             {
                 var newState = gameState.Move(move, player);
-                var score = GetScore(newState, player.GetOpponent(), depth, alpha, beta);
+
+                // Насколько мне известно, компилятор должен убрать недостижимые ветки
+                if (!withCache || !cache.TryGetValue(gameState, out var score))
+                {
+                    score = GetScore(newState, player.GetOpponent(), depth, alpha, beta, countdown);
+                    if (withCache)
+                        cache[gameState] = score;
+                }
                 
                 if (maximazingPlayer == player)
                     alpha = Math.Max(alpha, score);
@@ -43,12 +59,12 @@ namespace ConnectFourResearch.Solvers
             }
         }
         
-        private double GetScore(Board state, Cell player, int depth, double alpha, double beta)
+        private double GetScore(Board state, Cell player, int depth, double alpha, double beta, Countdown countdown)
         {
-            if (state.IsFinished() || depth == 0)
+            if (state.IsFinished() || depth == 0 || countdown.IsFinished())
                 return GetEstimateScore(state);
 
-            var moves = MiniMax(state, player, depth - 1, alpha, beta);
+            var moves = MiniMax(state, player, depth - 1, alpha, beta, countdown);
             var bestMove = player == maximazingPlayer
                 ? moves.MaxBy(m => m.Score)
                 : moves.MinBy(m => m.Score);
@@ -56,8 +72,8 @@ namespace ConnectFourResearch.Solvers
             return bestMove.Score;
         }
 
-        private double GetEstimateScore(Board board) =>
-            GetEstimateScore(board, maximazingPlayer) - GetEstimateScore(board, maximazingPlayer.GetOpponent());
+        // Очень осмысленный метод
+        private double GetEstimateScore(Board board) => GetEstimateScore(board, maximazingPlayer);
         
         private static double GetEstimateScore(Board board, Cell player) =>
             board.GetLinesCountOfLength(4, player) * 100000 +
