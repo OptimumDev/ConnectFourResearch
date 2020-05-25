@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using ConnectFourResearch.Algorithms;
@@ -8,7 +9,6 @@ namespace ConnectFourResearch.Solvers
     public class NegaMaxSolver : ISolver<Board, Move>
     {
         private readonly Cell me;
-        private readonly int defaultDepth = 5;
 
         public NegaMaxSolver(Cell me)
         {
@@ -17,34 +17,46 @@ namespace ConnectFourResearch.Solvers
 
         public IEnumerable<Move> GetSolutions(Board problem, Countdown countdown)
         {
-            return Solve(problem, me, defaultDepth, countdown).OrderBy(m => m.Score);
+            IEnumerable<Move> result;
+
+            var depth = 1;
+            do
+            {
+                result = Solve(problem, depth).ToList();
+                depth++;
+            } while (!countdown.IsFinished());
+
+            Console.WriteLine($"depth: {depth}");
+            return result.OrderBy(m => m.Score);
         }
 
-        private IEnumerable<Move> Solve(Board problem, Cell player, int depth, Countdown countdown)
+        private IEnumerable<Move> Solve(Board problem, int depth)
         {
-            return problem
-                .GetPossibleMoves()
-                .Select(move => new Move(move, -GetScore(problem.Move(move, player), player.GetOpponent(), depth, countdown)));
+            foreach (var possibleMove in problem.GetPossibleMoves())
+            {
+                var nextState = problem.Move(possibleMove, me);
+                var score = -NegaMax(nextState, me.GetOpponent(), depth);
+                yield return new Move(possibleMove, score);
+            }
         }
 
-        private double GetScore(Board board, Cell player, int depth, Countdown countdown) => 
-            (board.IsFinished(), depth, countdown.IsFinished()) switch
+        private double NegaMax(Board gameState, Cell player, int depth)
         {
-            (true, _, _) => GetFinishScore(board, player),
-            (_, 0, _) => GetEstimateScore(board, player),
-            (_, _, true) => GetEstimateScore(board, player),
-            _ => Solve(board, player, depth - 1, countdown).Max(b => b.Score)
-        };
+            if (depth == 0 || gameState.IsFinished())
+                return GetEstimateScore(gameState, player);
 
-        private static double GetFinishScore(Board board, Cell player) =>
-            (board.GetLinesCountOfLength(4, player) -
-            board.GetLinesCountOfLength(4, player.GetOpponent())) *
-            1_000_000_000;
+            var value = double.NegativeInfinity;
+            foreach (var possibleMove in gameState.GetPossibleMoves())
+            {
+                var child = gameState.Move(possibleMove, player);
+                value = Math.Max(value, -NegaMax(child, player.GetOpponent(), depth - 1));
+            }
+            return value;
+        }
 
         private static double GetEstimateScore(Board board, Cell player) =>
             GetPlayerEstimateScore(board, player) - GetPlayerEstimateScore(board, player.GetOpponent());
 
-        // Enumerable.Range(2, 3).Select(i => board.GetLinesCountOfLength(i, player) * Math.Pow(10, i)).Sum();
         private static double GetPlayerEstimateScore(Board board, Cell player) =>
             board.GetLinesCountOfLength(4, player) * 100000 +
             board.GetLinesCountOfLength(3, player) * 1000 +

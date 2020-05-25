@@ -13,9 +13,9 @@ namespace ConnectFourResearch
             Console.OutputEncoding = Encoding.UTF8;
             var logger = new ConsoleBoardLogger();
 
-            var yellowPlayer = new MiniMaxSolver(Cell.Yellow, true);
-            var redPlayer = new NegaMaxSolver(Cell.Red);
-            var controller = new Controller(yellowPlayer, redPlayer, logger);
+            var yellowPlayer = new NegaMaxSolver(Cell.Yellow);
+            var redPlayer = new MiniMaxSolver(Cell.Red);
+            var controller = new Controller(yellowPlayer, redPlayer, 500, logger);
 
             var result = controller.Play(true);
 

@@ -10,88 +10,102 @@ namespace ConnectFourResearch.Solvers
     public class MiniMaxSolver : ISolver<Board, Move>
     {
         private readonly Cell maximazingPlayer;
-        private int defaultDepth = 10;
-        private bool withCache;
-        private Dictionary<Board, Move> cache = new Dictionary<Board, Move>();
+        private readonly bool withCache;
+        private readonly bool withSorting;
+        private readonly Dictionary<(Board, int), double> cache;
 
-        public MiniMaxSolver(Cell maximazingPlayer, bool withCache = false)
+        public MiniMaxSolver(Cell maximazingPlayer, bool withSorting = true, bool withCache = false)
         {
             this.maximazingPlayer = maximazingPlayer;
+            this.withSorting = withSorting;
             this.withCache = withCache;
+            cache = new Dictionary<(Board, int), double>();
         }
 
         public IEnumerable<Move> GetSolutions(Board problem, Countdown countdown)
         {
-            if (withCache)
-                return new [] {CachingMiniMax(problem, maximazingPlayer, defaultDepth, double.NegativeInfinity, double.PositiveInfinity, countdown)};
-            
-            IEnumerable<Move> result = new Move[0];
-            
+            IEnumerable<Move> result;
+
             var depth = 1;
             do
             {
-                // А нужно ли теперь Countdown прокидывать?
-                var newResult = MiniMax(problem, maximazingPlayer, depth, double.NegativeInfinity, double.PositiveInfinity, countdown);
-                if (!countdown.IsFinished())
-                    result = newResult;
+                result = Solve(problem, depth).ToList();
                 depth++;
             } while (!countdown.IsFinished());
-            
+
+            Console.WriteLine($"depth: {depth}");
             return result.OrderBy(m => m.Score);
         }
 
-        private Move CachingMiniMax(Board gameState, Cell player, int depth, double alpha, double beta, Countdown countdown)
+        private IEnumerable<Move> Solve(Board problem, int depth)
         {
-            if (cache.TryGetValue(gameState, out var result))
-                return result;
+            var moves = problem.GetPossibleMoves();
+            if (withSorting)
+                moves = SortPossibleMoves(moves);
 
-            var moves = MiniMax(gameState, player, depth, alpha, beta, countdown)
-                .OrderBy(m => m.Score)
-                .Last();
-
-            cache[gameState] = moves;
-
-            return moves;
-
+            return moves.Select(m => EvaluateMove(problem, m, depth));
         }
 
-        private IEnumerable<Move> MiniMax(Board gameState, Cell player, int depth, double alpha, double beta, Countdown countdown)
+
+        private Move EvaluateMove(Board gameState, int move, int depth)
         {
-            foreach(var move in gameState.GetPossibleMoves())
+            var nextState = gameState.Move(move, maximazingPlayer);
+            var score = MiniMax(nextState, maximazingPlayer.GetOpponent(), depth);
+            return new Move(move, score);
+        }
+
+        private double MiniMax(Board gameState, Cell player, int depth,
+            double alpha = double.NegativeInfinity, double beta = double.PositiveInfinity)
+        {
+            if (gameState.IsFinished() || depth == 0)
+                return GetEstimateScore(gameState);
+
+            return player == maximazingPlayer
+                ? MaximizeScore(gameState, player, depth, alpha, beta)
+                : MinimizeScore(gameState, player, depth, alpha, beta);
+        }
+
+        private double MinimizeScore(Board gameState, Cell player, int depth, double alpha, double beta)
+        {
+            var score = double.PositiveInfinity;
+            foreach (var move in gameState.GetPossibleMoves())
             {
-                var newState = gameState.Move(move, player);
-                var score = GetScore(newState, player.GetOpponent(), depth, alpha, beta, countdown);
-                
-                if (maximazingPlayer == player)
-                    alpha = Math.Max(alpha, score);
-                else
-                    beta = Math.Min(beta, score);
-                yield return new Move(move, score);
-                
+                var nextState = gameState.Move(move, player);
+                var nextStateScore = MiniMax(nextState, player.GetOpponent(), depth - 1, alpha, beta);
+                score = Math.Min(score, nextStateScore);
+                beta = Math.Min(beta, score);
                 if (alpha >= beta)
-                    yield break;
+                    break;
             }
+            return score;
         }
-        
-        private double GetScore(Board state, Cell player, int depth, double alpha, double beta, Countdown countdown)
+
+        private double MaximizeScore(Board gameState, Cell player, int depth, double alpha, double beta)
         {
-            if (state.IsFinished() || depth == 0 || countdown.IsFinished())
-                return GetEstimateScore(state);
-
-            var moves = MiniMax(state, player, depth - 1, alpha, beta, countdown);
-            var bestMove = player == maximazingPlayer
-                ? moves.MaxBy(m => m.Score)
-                : moves.MinBy(m => m.Score);
-                
-            return bestMove.Score;
+            var score = double.NegativeInfinity;
+            foreach (var move in gameState.GetPossibleMoves())
+            {
+                var nextState = gameState.Move(move, player);
+                var nextStateScore = MiniMax(nextState, player.GetOpponent(), depth - 1, alpha, beta);
+                score = Math.Max(score, nextStateScore);
+                alpha = Math.Max(alpha, score);
+                if (alpha >= beta)
+                    break;
+            }
+            return score;
         }
 
-        private double GetEstimateScore(Board board) => 
+        private double GetEstimateScore(Board board) =>
             GetEstimateScore(board, maximazingPlayer) - GetEstimateScore(board, maximazingPlayer.GetOpponent());
-        
+
         private static double GetEstimateScore(Board board, Cell player) =>
             board.GetLinesCountOfLength(4, player) * 100000 +
             board.GetLinesCountOfLength(3, player) * 1000 +
             board.GetLinesCountOfLength(2, player) * 100;
+
+        private static IEnumerable<int> SortPossibleMoves(IEnumerable<int> possibleMoves)
+        {
+            return possibleMoves.OrderBy(m => Math.Abs(m - Board.Width / 2));
+        }
     }
 }

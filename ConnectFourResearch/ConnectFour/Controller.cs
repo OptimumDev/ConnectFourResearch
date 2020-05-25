@@ -8,10 +8,13 @@ namespace ConnectFourResearch.ConnectFour
     public class Controller
     {
         private readonly Dictionary<Cell, ISolver<Board, Move>> solvers;
+        private readonly int countdown;
         private readonly IBoardLogger logger;
 
-        public Controller(ISolver<Board, Move> yellowPlayer, ISolver<Board, Move> redPlayer, IBoardLogger logger)
+        public Controller(ISolver<Board, Move> yellowPlayer, ISolver<Board, Move> redPlayer,
+            int countdown, IBoardLogger logger)
         {
+            this.countdown = countdown;
             this.logger = logger;
 
             solvers = new Dictionary<Cell, ISolver<Board, Move>>
@@ -28,7 +31,7 @@ namespace ConnectFourResearch.ConnectFour
 
             while (!board.IsFinished())
             {
-                var moves = solvers[currentPlayer].GetSolutions(board, 100).ToList();
+                var moves = solvers[currentPlayer].GetSolutions(board, countdown).ToList();
                 if (makeLog)
                     logger.Log(board, moves.AsEnumerable().Reverse(), currentPlayer);
                 board = board.Move(moves[^1].Column, currentPlayer);
