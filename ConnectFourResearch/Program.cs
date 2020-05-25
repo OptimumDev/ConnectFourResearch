@@ -13,7 +13,7 @@ namespace ConnectFourResearch
             Console.OutputEncoding = Encoding.UTF8;
             var logger = new ConsoleBoardLogger();
 
-            var yellowPlayer = new MiniMaxSolver(Cell.Yellow);
+            var yellowPlayer = new MiniMaxSolver(Cell.Yellow, false);
             var redPlayer = new NegaMaxSolver(Cell.Red);
             var controller = new Controller(yellowPlayer, redPlayer, logger);
 

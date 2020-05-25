@@ -10,8 +10,9 @@ namespace ConnectFourResearch.Solvers
     public class MiniMaxSolver : ISolver<Board, Move>
     {
         private readonly Cell maximazingPlayer;
+        private int defaultDepth = 5;
         private bool withCache;
-        private Dictionary<Board, double> cache = new Dictionary<Board, double>();
+        private Dictionary<Board, Move> cache = new Dictionary<Board, Move>();
 
         public MiniMaxSolver(Cell maximazingPlayer, bool withCache = false)
         {
@@ -21,17 +22,37 @@ namespace ConnectFourResearch.Solvers
 
         public IEnumerable<Move> GetSolutions(Board problem, Countdown countdown)
         {
-            IEnumerable<Move> result;
+            if (withCache)
+                return CachingMiniMax(problem, maximazingPlayer, defaultDepth, double.NegativeInfinity, double.PositiveInfinity, countdown);
+            
+            IEnumerable<Move> result = new Move[0];
             
             var depth = 1;
             do
             {
                 // А нужно ли теперь Countdown прокидывать?
-                result = MiniMax(problem, maximazingPlayer, depth, double.NegativeInfinity, double.PositiveInfinity, countdown);
+                var newResult = MiniMax(problem, maximazingPlayer, depth, double.NegativeInfinity, double.PositiveInfinity, countdown);
+                if (!countdown.IsFinished())
+                    result = newResult;
                 depth++;
             } while (!countdown.IsFinished());
             
             return result.OrderBy(m => m.Score);
+        }
+
+        private IEnumerable<Move> CachingMiniMax(Board gameState, Cell player, int depth, double alpha, double beta, Countdown countdown)
+        {
+            if (cache.TryGetValue(gameState, out var result))
+                return new[] {result};
+
+            var moves = MiniMax(gameState, player, depth, alpha, beta, countdown)
+                .OrderBy(m => m.Score)
+                .ToArray();
+            
+            cache[gameState] = moves.Last();
+
+            return moves;
+
         }
 
         private IEnumerable<Move> MiniMax(Board gameState, Cell player, int depth, double alpha, double beta, Countdown countdown)
@@ -39,14 +60,7 @@ namespace ConnectFourResearch.Solvers
             foreach(var move in gameState.GetPossibleMoves())
             {
                 var newState = gameState.Move(move, player);
-
-                // Насколько мне известно, компилятор должен убрать недостижимые ветки
-                if (!withCache || !cache.TryGetValue(gameState, out var score))
-                {
-                    score = GetScore(newState, player.GetOpponent(), depth, alpha, beta, countdown);
-                    if (withCache)
-                        cache[gameState] = score;
-                }
+                var score = GetScore(newState, player.GetOpponent(), depth, alpha, beta, countdown);
                 
                 if (maximazingPlayer == player)
                     alpha = Math.Max(alpha, score);
@@ -72,8 +86,8 @@ namespace ConnectFourResearch.Solvers
             return bestMove.Score;
         }
 
-        // Очень осмысленный метод
-        private double GetEstimateScore(Board board) => GetEstimateScore(board, maximazingPlayer);
+        private double GetEstimateScore(Board board) => 
+            GetEstimateScore(board, maximazingPlayer) - GetEstimateScore(board, maximazingPlayer.GetOpponent());
         
         private static double GetEstimateScore(Board board, Cell player) =>
             board.GetLinesCountOfLength(4, player) * 100000 +
