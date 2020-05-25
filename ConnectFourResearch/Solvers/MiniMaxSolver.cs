@@ -10,7 +10,7 @@ namespace ConnectFourResearch.Solvers
     public class MiniMaxSolver : ISolver<Board, Move>
     {
         private readonly Cell maximazingPlayer;
-        private int defaultDepth = 5;
+        private int defaultDepth = 10;
         private bool withCache;
         private Dictionary<Board, Move> cache = new Dictionary<Board, Move>();
 
@@ -23,7 +23,7 @@ namespace ConnectFourResearch.Solvers
         public IEnumerable<Move> GetSolutions(Board problem, Countdown countdown)
         {
             if (withCache)
-                return CachingMiniMax(problem, maximazingPlayer, defaultDepth, double.NegativeInfinity, double.PositiveInfinity, countdown);
+                return new [] {CachingMiniMax(problem, maximazingPlayer, defaultDepth, double.NegativeInfinity, double.PositiveInfinity, countdown)};
             
             IEnumerable<Move> result = new Move[0];
             
@@ -40,16 +40,16 @@ namespace ConnectFourResearch.Solvers
             return result.OrderBy(m => m.Score);
         }
 
-        private IEnumerable<Move> CachingMiniMax(Board gameState, Cell player, int depth, double alpha, double beta, Countdown countdown)
+        private Move CachingMiniMax(Board gameState, Cell player, int depth, double alpha, double beta, Countdown countdown)
         {
             if (cache.TryGetValue(gameState, out var result))
-                return new[] {result};
+                return result;
 
             var moves = MiniMax(gameState, player, depth, alpha, beta, countdown)
                 .OrderBy(m => m.Score)
-                .ToArray();
-            
-            cache[gameState] = moves.Last();
+                .Last();
+
+            cache[gameState] = moves;
 
             return moves;
 
