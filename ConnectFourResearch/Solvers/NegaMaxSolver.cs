@@ -17,21 +17,23 @@ namespace ConnectFourResearch.Solvers
 
         public IEnumerable<Move> GetSolutions(Board problem, Countdown countdown)
         {
-            return Solve(problem, me, defaultDepth).OrderBy(m => m.Score);
+            return Solve(problem, me, defaultDepth, countdown).OrderBy(m => m.Score);
         }
 
-        private IEnumerable<Move> Solve(Board problem, Cell player, int depth)
+        private IEnumerable<Move> Solve(Board problem, Cell player, int depth, Countdown countdown)
         {
             return problem
                 .GetPossibleMoves()
-                .Select(move => new Move(move, -GetScore(problem.Move(move, player), player.GetOpponent(), depth)));
+                .Select(move => new Move(move, -GetScore(problem.Move(move, player), player.GetOpponent(), depth, countdown)));
         }
 
-        private double GetScore(Board board, Cell player, int depth) => (board.IsFinished(), depth) switch
+        private double GetScore(Board board, Cell player, int depth, Countdown countdown) => 
+            (board.IsFinished(), depth, countdown.IsFinished()) switch
         {
-            (true, _) => GetFinishScore(board, player),
-            (_, 0) => GetEstimateScore(board, player),
-            _ => Solve(board, player, depth - 1).Max(b => b.Score)
+            (true, _, _) => GetFinishScore(board, player),
+            (_, 0, _) => GetEstimateScore(board, player),
+            (_, _, true) => GetEstimateScore(board, player),
+            _ => Solve(board, player, depth - 1, countdown).Max(b => b.Score)
         };
 
         private static double GetFinishScore(Board board, Cell player) =>
