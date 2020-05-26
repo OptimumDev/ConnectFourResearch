@@ -44,14 +44,12 @@
 Мы сделали 2 логгера: 
 [для консоли](https://github.com/OptimumDev/ConnectFourResearch/blob/master/ConnectFourResearch/Logging/ConsoleBoardLogger.cs)
 и 
-[для записи в файл](https://github.com/OptimumDev/ConnectFourResearch/blob/master/ConnectFourResearch/Logging/FileBoardLogger.cs) - кроме поля они логирую варинты ходов и счет для удобного дебага  
+[для записи в файл](https://github.com/OptimumDev/ConnectFourResearch/blob/master/ConnectFourResearch/Logging/FileBoardLogger.cs) - кроме поля они логируют варинты ходов и счет для удобного дебага  
 Реализовали универсальный
 [Controller](https://github.com/OptimumDev/ConnectFourResearch/blob/master/ConnectFourResearch/ConnectFour/Controller.cs)
 который принимает два
 [ISolver](https://github.com/OptimumDev/ConnectFourResearch/blob/master/ConnectFourResearch/Algorithms/ISolver.cs) и умеет симулировать игру  
-Так же сделали консольный интерфейс для пользователя в виде
-[реализации](https://github.com/OptimumDev/ConnectFourResearch/blob/master/ConnectFourResearch/Solvers/ConsoleSolver.cs)
-`ISolver`
+Так же сделали консольный интерфейс для пользователя в виде [реализации ISolver](https://github.com/OptimumDev/ConnectFourResearch/blob/master/ConnectFourResearch/Solvers/ConsoleSolver.cs)
 
 ## Алгоритмы
 
@@ -121,7 +119,7 @@
 
 ### Против человека
 
-Никто из нашей команды ни разу не смог победить лучший алгоритм, независимо от порядка ходов. Игра почти всегда сводилась к ходу, где у бота 2 выигрышных хода и мы можем перекрыть только один из них. Поиграть можно просто запустив программу - [выставлена игра](https://github.com/OptimumDev/ConnectFourResearch/blob/master/ConnectFourResearch/Program.cs#L11) за желтого игрока против MiniMax алгоритма с приоритетом ходов и кэшированием
+Никто из нашей команды ни разу не смог победить лучший алгоритм, независимо от порядка ходов. Игра почти всегда сводилась к ситуации, когда у бота 2 выигрышных хода и мы можем перекрыть только один из них. Поиграть можно просто запустив программу - [выставлена игра](https://github.com/OptimumDev/ConnectFourResearch/blob/master/ConnectFourResearch/Program.cs#L11) за желтого игрока против MiniMax алгоритма с приоритетом ходов и кэшированием
 
 ## Выводы
 
