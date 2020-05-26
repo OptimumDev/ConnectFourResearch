@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using ConnectFourResearch.Algorithms;
 using ConnectFourResearch.ConnectFour;
@@ -13,22 +12,25 @@ namespace ConnectFourResearch.Tests
     {
         private const int TestTime = 10_000;
 
-        private delegate ISolver<Board, Move> SolverFabric(Cell player, int maxDepth);
-
         [Test]
         public void SpeedOfAllTest()
         {
-            var results = GetSolverFabrics()
+            var results = TestHelper.GetSolverFabrics()
                 .Select(RunSpeedTest)
-                .OrderByDescending(s => s.Score);
+                .ToList();
 
+            if (results.Any(r => r == null))
+                Assert.Fail("Someone lost((");
+
+            var ordered = results.OrderByDescending(s => s.Score);
             Console.WriteLine("| Solver | Games | Wins | Score |");
-            foreach (var result in results)
+            Console.WriteLine("| --- | --- | --- | --- |");
+            foreach (var result in ordered)
                 Console.WriteLine(result);
         }
 
         // Насколько быстро выигрываем жадный алгоритм
-        private static TestStat RunSpeedTest(SolverFabric fabric)
+        private static TestStat RunSpeedTest(TestHelper.SolverFabric fabric)
         {
             var solver = fabric(Cell.Yellow, 5);
             var greedy = new GreedySolver(Cell.Red);
@@ -42,24 +44,13 @@ namespace ConnectFourResearch.Tests
             {
                 var result = controller.Play();
                 gamesCount++;
-                if (IsWon(result, Cell.Yellow))
+                if (TestHelper.IsWon(result, Cell.Yellow))
                     winsCount++;
-                if (IsWon(result, Cell.Red))
+                if (TestHelper.IsWon(result, Cell.Red))
                     return null;
             }
 
             return new TestStat(gamesCount, winsCount, solver.Name);
-        }
-
-        private static bool IsWon(Board game, Cell player) => game.GetLinesCountOfLength(4, player) > 0;
-
-        private static IEnumerable<SolverFabric> GetSolverFabrics()
-        {
-            yield return (c, d) => new NegaMaxSolver(c, d);
-            yield return (c, d) => new MiniMaxSolver(c, maxDepth: d);
-            yield return (c, d) => new MiniMaxSolver(c, true, maxDepth: d);
-            yield return (c, d) => new MiniMaxSolver(c, false, true, d);
-            yield return (c, d) => new MiniMaxSolver(c, true, true, d);
         }
     }
 }
