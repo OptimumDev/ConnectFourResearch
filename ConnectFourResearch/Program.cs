@@ -14,7 +14,7 @@ namespace ConnectFourResearch
             var logger = new ConsoleBoardLogger();
 
             var yellowPlayer = new NegaMaxSolver(Cell.Yellow);
-            var redPlayer = new MiniMaxSolver(Cell.Red);
+            var redPlayer = new MiniMaxSolver(Cell.Red, true, true);
             var controller = new Controller(yellowPlayer, redPlayer, 500, logger);
 
             var result = controller.Play(true);
