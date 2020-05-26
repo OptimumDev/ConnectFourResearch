@@ -280,6 +280,27 @@ namespace ConnectFourResearch.Tests
             game.GetPossibleMoves().Should().BeEquivalentTo(expected);
         }
 
+        [Test]
+        public void EqualityMembers_WorkRight_ForDifferentPaths()
+        {
+            var game = board;
+
+            var game1 = game
+                .Move(0, Cell.Yellow)
+                .Move(0, Cell.Yellow)
+                .Move(3, Cell.Red)
+                .Move(3, Cell.Red);
+
+            var game2 = game
+                .Move(0, Cell.Yellow)
+                .Move(3, Cell.Red)
+                .Move(0, Cell.Yellow)
+                .Move(3, Cell.Red);
+
+            game1.GetHashCode().Should().Be(game2.GetHashCode());
+            game1.Equals(game2).Should().BeTrue();
+        }
+
         private static Board BuildColumn(Cell player, Board game, int length)
         {
             for (var i = 0; i < length; i++)

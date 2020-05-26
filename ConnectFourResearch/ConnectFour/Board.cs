@@ -50,8 +50,7 @@ namespace ConnectFourResearch.ConnectFour
         private bool Equals(Board other)
         {
             return _redPositions == other._redPositions &&
-                   _yellowPositions == other._yellowPositions &&
-                   _heights.Equals(other._heights);
+                   _yellowPositions == other._yellowPositions;
         }
 
         public Board Move(int column, Cell player)
