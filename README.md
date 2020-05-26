@@ -4,8 +4,13 @@
 
 ## Реализация
 
-Для данного исследования мы написали свою реализацию игры "Connect four". Мы использовали максимально эффективное использование данных для минимазии скорости работы логики (чтобы проверять именно скорость работы алгоритмов, а не логики игры). Вот несколько основных приемов, которые мы использовали:
- - Поле хранится в виде 2 `ulong` полей: позиции фишек желтого игрока и позиции фишек красного игрока. Бит 1 означает наличие фишки, иначе - ее отсутствие. Такой подход позволяет перебрать все линии из длины `N` за практически константное время (при учете, что нет смысла проверять длину меньше 2 и больше 4) - Делается `N` битовых сдвигов с `&` операцией и далее идет подсчет количества установленых бит.
+Для данного исследования мы написали свою
+[реализацию игры](https://github.com/OptimumDev/ConnectFourResearch/blob/master/ConnectFourResearch/ConnectFour/Board.cs)
+"Connect four". Мы использовали максимально эффективное использование данных для минимазии скорости работы логики (чтобы проверять именно скорость работы алгоритмов, а не логики игры). Вот несколько основных приемов, которые мы использовали:
+ - Поле хранится в виде 2 `ulong`
+ [полей](https://github.com/OptimumDev/ConnectFourResearch/blob/master/ConnectFourResearch/ConnectFour/Board.cs#L23): позиции фишек желтого игрока и позиции фишек красного игрока. Бит 1 означает наличие фишки, иначе - ее отсутствие. Такой подход
+ [позволяет перебрать все линии](https://github.com/OptimumDev/ConnectFourResearch/blob/master/ConnectFourResearch/ConnectFour/Board.cs#L88)
+из длины `N` за практически константное время (при учете, что нет смысла проверять длину меньше 2 и больше 4) - Делается `N` битовых сдвигов с `&` операцией и далее идет [подсчет количества установленых бит](https://github.com/OptimumDev/ConnectFourResearch/blob/master/ConnectFourResearch/Extensions/UlongExtensions.cs#L5).
 ~~~
   6 13 20 27 34 41 48   55 62  <-  Дополнительный ряд для того, чтобы 
 +---------------------+            не учитывать следующий столбец при битовом сдвиге
@@ -17,12 +22,17 @@
 | 0  7 14 21 28 35 42 | 49 56 63  
 +---------------------+
 ~~~
- - Дополнительно используется массив с указателями, на верхнюю фишку в столбике, позволяет быстро определять место выставления фишки и возможность ее установления вообще.
- - Реализован хэш Зобриста и функция `Equals` (которая тоже очень быстрая за счет хранения поля в двух числовых переменных)
+ - Дополнительно используется [массив с указателями на верхнюю фишку в столбике](https://github.com/OptimumDev/ConnectFourResearch/blob/master/ConnectFourResearch/ConnectFour/Board.cs#L25), позволяет быстро определять место выставления фишки и возможность ее установления вообще.
+ - Реализован
+[хэш Зобриста](https://github.com/OptimumDev/ConnectFourResearch/blob/master/ConnectFourResearch/ConnectFour/Board.cs#L122)
+и функция 
+[Equals](https://github.com/OptimumDev/ConnectFourResearch/blob/master/ConnectFourResearch/ConnectFour/Board.cs#L50)
+(которая тоже очень быстрая за счет хранения поля в двух числовых переменных)
  
 ## Проверка реализации
 
-На реализацию алгоритма написаны тесты
+На реализацию алгоритма написаны 
+[тесты](https://github.com/OptimumDev/ConnectFourResearch/blob/master/ConnectFourResearch/Tests/BoardTests.cs)
  - Они покрывают большее количество игровых случаев
  - Поверяют функции сравнения
  - Тестируют правильное завершение игры
@@ -31,27 +41,38 @@
 
 ## Интерфейс
  
-Мы сделали 2 логгера: для консоли и для записи в файл - кроме поля они логирую варинты ходов и счет для удобного дебага  
-Реализовали универсальный `Controller` который принимает два `ISolver` и умеет симулировать игру  
-Так же сделали консольный интерфейс для пользователя в виде реализации `ISolver`
+Мы сделали 2 логгера: 
+[для консоли](https://github.com/OptimumDev/ConnectFourResearch/blob/master/ConnectFourResearch/Logging/ConsoleBoardLogger.cs)
+и 
+[для записи в файл](https://github.com/OptimumDev/ConnectFourResearch/blob/master/ConnectFourResearch/Logging/FileBoardLogger.cs) - кроме поля они логирую варинты ходов и счет для удобного дебага  
+Реализовали универсальный
+[Controller](https://github.com/OptimumDev/ConnectFourResearch/blob/master/ConnectFourResearch/ConnectFour/Controller.cs)
+который принимает два
+[ISolver](https://github.com/OptimumDev/ConnectFourResearch/blob/master/ConnectFourResearch/Algorithms/ISolver.cs) и умеет симулировать игру  
+Так же сделали консольный интерфейс для пользователя в виде
+[реализации](https://github.com/OptimumDev/ConnectFourResearch/blob/master/ConnectFourResearch/Solvers/ConsoleSolver.cs)
+`ISolver`
 
 ## Алгоритмы
 
 Мы реализовали различные вариации MiniMax алгоритма
- 1. NegaMax
- 2. MiniMax с Альфа-Бета отсечением и двумя дополнительными стратегиями:
-    - Приоритет ходов
-    - Кэширование
+ 1. [NegaMax](https://github.com/OptimumDev/ConnectFourResearch/blob/master/ConnectFourResearch/Solvers/NegaMaxSolver.cs)
+ 2. [MiniMax](https://github.com/OptimumDev/ConnectFourResearch/blob/master/ConnectFourResearch/Solvers/MiniMaxSolver.cs) с Альфа-Бета отсечением и двумя дополнительными стратегиями:
+    - [Приоритет ходов](https://github.com/OptimumDev/ConnectFourResearch/blob/master/ConnectFourResearch/Solvers/MiniMaxSolver.cs#L162)
+    - [Кэширование](https://github.com/OptimumDev/ConnectFourResearch/blob/master/ConnectFourResearch/Solvers/MiniMaxSolver.cs#L72)
  
-В каждом из них используется итеративная глубина поиска (для ограничения по времени) с ограничением ее максимального знчаения (удобно для тестов)
+В каждом из них используется [итеративная глубина поиска](https://github.com/OptimumDev/ConnectFourResearch/blob/master/ConnectFourResearch/Solvers/MiniMaxSolver.cs#L35) (для ограничения по времени) с ограничением ее максимального знчаения (удобно для тестов)
 
-Так же мы написали простой Жадный алгоритм для автоматических тестов на скорость алгоритма
+Так же мы написали простой
+[Жадный алгоритм](https://github.com/OptimumDev/ConnectFourResearch/blob/master/ConnectFourResearch/Solvers/GreedySolver.cs)
+для автоматических тестов на скорость алгоритма
 
 ## Тесты
 
 Главным показателем мы решили считать счет, набранный за 10 секунд игр против жадного алгоритма. При этом алгоритмам дается 100 мс на ход и максимальная глубина ограничивается 5. Счет вычисляется простой формулой: `100 * <количество побед> + <количество игр>`
 
-Вот результаты такого теста:
+Вот результаты
+[такого теста](https://github.com/OptimumDev/ConnectFourResearch/blob/master/ConnectFourResearch/Tests/SpeedTests.cs#L19):
 
 | Solver | Games | Wins | Score |
 | --- | --- | --- | --- |
