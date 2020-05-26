@@ -10,14 +10,17 @@ namespace ConnectFourResearch.Solvers
     {
         private readonly Cell maximazingPlayer;
         private readonly bool withCache;
+        private readonly int maxDepth;
         private readonly bool withSorting;
         private readonly Dictionary<Board, CacheValue> cache;
 
-        public MiniMaxSolver(Cell maximazingPlayer, bool withSorting = false, bool withCache = false)
+        public MiniMaxSolver(Cell maximazingPlayer, bool withSorting = false, bool withCache = false,
+            int maxDepth = Board.Width * Board.Height)
         {
             this.maximazingPlayer = maximazingPlayer;
             this.withSorting = withSorting;
             this.withCache = withCache;
+            this.maxDepth = maxDepth;
             cache = new Dictionary<Board, CacheValue>();
         }
 
@@ -30,9 +33,8 @@ namespace ConnectFourResearch.Solvers
             {
                 result = Solve(problem, depth).ToList();
                 depth++;
-            } while (!countdown.IsFinished());
+            } while (!countdown.IsFinished() && depth <= maxDepth);
 
-            Console.WriteLine($"depth: {depth}");
             return result.OrderBy(m => m.Score);
         }
 
@@ -161,5 +163,7 @@ namespace ConnectFourResearch.Solvers
         {
             return possibleMoves.OrderBy(m => Math.Abs(m - Board.Width / 2));
         }
+
+        public string Name => $"MiniMax{(withSorting ? " with sorting" : "")}{(withCache ? " with cache" : "")}";
     }
 }

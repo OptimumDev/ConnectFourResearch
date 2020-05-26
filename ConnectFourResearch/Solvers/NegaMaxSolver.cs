@@ -9,10 +9,12 @@ namespace ConnectFourResearch.Solvers
     public class NegaMaxSolver : ISolver<Board, Move>
     {
         private readonly Cell me;
+        private readonly int maxDepth;
 
-        public NegaMaxSolver(Cell me)
+        public NegaMaxSolver(Cell me, int maxDepth = Board.Width * Board.Height)
         {
             this.me = me;
+            this.maxDepth = maxDepth;
         }
 
         public IEnumerable<Move> GetSolutions(Board problem, Countdown countdown)
@@ -24,10 +26,10 @@ namespace ConnectFourResearch.Solvers
             {
                 result = Solve(problem, depth).ToList();
                 depth++;
-            } while (!countdown.IsFinished());
+            } while (!countdown.IsFinished() && depth <= maxDepth);
 
-            Console.WriteLine($"depth: {depth}");
             return result.OrderBy(m => m.Score);
+
         }
 
         private IEnumerable<Move> Solve(Board problem, int depth)
@@ -61,5 +63,7 @@ namespace ConnectFourResearch.Solvers
             board.GetLinesCountOfLength(4, player) * 100000 +
             board.GetLinesCountOfLength(3, player) * 1000 +
             board.GetLinesCountOfLength(2, player) * 100;
+
+        public string Name => "NegaMax";
     }
 }

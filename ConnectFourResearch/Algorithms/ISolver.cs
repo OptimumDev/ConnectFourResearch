@@ -11,5 +11,7 @@ namespace ConnectFourResearch.Algorithms
         ///     You may return only one the best solution, but sequence of improvements can help in debugging
         /// </returns>
         IEnumerable<TSolution> GetSolutions(TProblem problem, Countdown countdown);
+
+        string Name { get; }
     }
 }

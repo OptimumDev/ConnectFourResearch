@@ -38,5 +38,7 @@ namespace ConnectFourResearch.Solvers
             board.GetLinesCountOfLength(4, player) * 100000 +
             board.GetLinesCountOfLength(3, player) * 1000 +
             board.GetLinesCountOfLength(2, player) * 100;
+
+        public string Name => "Greedy";
     }
 }

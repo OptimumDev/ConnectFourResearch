@@ -37,5 +37,7 @@ namespace ConnectFourResearch.Solvers
 
             return column - 1;
         }
+
+        public string Name => "Console solver for human player";
     }
 }
