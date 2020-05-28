@@ -61,7 +61,8 @@ namespace ConnectFourResearch.Tests
         {
             Cell.Yellow => "Желтый",
             Cell.Red => "Красный",
-            Cell.Empty => "Ничья"
+            Cell.Empty => "Ничья",
+            _ => throw new ArgumentException()
         };
 
         private static string GetSolverName(TestHelper.SolverFabric fabric)

@@ -19,39 +19,40 @@ namespace ConnectFourResearch.Solvers
 
         public IEnumerable<Move> GetSolutions(Board problem, Countdown countdown)
         {
-            IEnumerable<Move> result;
+            IEnumerable<Move> result = new Move[0];
 
             var depth = 1;
             do
             {
-                result = Solve(problem, depth).ToList();
+                var nextResult = Solve(problem, depth, countdown).ToList();
+                if (!countdown.IsFinished())
+                    result = nextResult;
                 depth++;
             } while (!countdown.IsFinished() && depth <= maxDepth);
 
             return result.OrderBy(m => m.Score);
-
         }
 
-        private IEnumerable<Move> Solve(Board problem, int depth)
+        private IEnumerable<Move> Solve(Board problem, int depth, Countdown countdown)
         {
             foreach (var possibleMove in problem.GetPossibleMoves())
             {
                 var nextState = problem.Move(possibleMove, me);
-                var score = -NegaMax(nextState, me.GetOpponent(), depth);
+                var score = -NegaMax(nextState, me.GetOpponent(), depth, countdown);
                 yield return new Move(possibleMove, score);
             }
         }
 
-        private double NegaMax(Board gameState, Cell player, int depth)
+        private double NegaMax(Board gameState, Cell player, int depth, Countdown countdown)
         {
-            if (depth == 0 || gameState.IsFinished())
+            if (depth == 0 || gameState.IsFinished() || countdown.IsFinished())
                 return GetEstimateScore(gameState, player);
 
             var value = double.NegativeInfinity;
             foreach (var possibleMove in gameState.GetPossibleMoves())
             {
                 var child = gameState.Move(possibleMove, player);
-                value = Math.Max(value, -NegaMax(child, player.GetOpponent(), depth - 1));
+                value = Math.Max(value, -NegaMax(child, player.GetOpponent(), depth - 1, countdown));
             }
             return value;
         }

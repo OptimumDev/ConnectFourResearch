@@ -26,47 +26,49 @@ namespace ConnectFourResearch.Solvers
 
         public IEnumerable<Move> GetSolutions(Board problem, Countdown countdown)
         {
-            IEnumerable<Move> result;
+            IEnumerable<Move> result = new Move[0];
 
             var depth = 1;
             do
             {
-                result = Solve(problem, depth).ToList();
+                var nextResult = Solve(problem, depth, countdown).ToList();
+                if (!countdown.IsFinished())
+                    result = nextResult;
                 depth++;
             } while (!countdown.IsFinished() && depth <= maxDepth);
 
             return result.OrderBy(m => m.Score);
         }
 
-        private IEnumerable<Move> Solve(Board problem, int depth)
+        private IEnumerable<Move> Solve(Board problem, int depth, Countdown countdown)
         {
             var moves = problem.GetPossibleMoves();
             if (withSorting)
                 moves = SortPossibleMoves(moves);
 
-            return moves.Select(m => EvaluateMove(problem, m, depth));
+            return moves.Select(m => EvaluateMove(problem, m, depth, countdown));
         }
 
 
-        private Move EvaluateMove(Board gameState, int move, int depth)
+        private Move EvaluateMove(Board gameState, int move, int depth, Countdown countdown)
         {
             var nextState = gameState.Move(move, maximazingPlayer);
-            var score = MiniMax(nextState, maximazingPlayer.GetOpponent(), depth);
+            var score = MiniMax(nextState, maximazingPlayer.GetOpponent(), depth, countdown);
             return new Move(move, score);
         }
 
-        private double MiniMax(Board gameState, Cell player, int depth,
+        private double MiniMax(Board gameState, Cell player, int depth, Countdown countdown,
             double alpha = double.NegativeInfinity, double beta = double.PositiveInfinity)
         {
-            if (gameState.IsFinished() || depth == 0)
+            if (gameState.IsFinished() || depth == 0 || countdown.IsFinished())
                 return GetEstimateScore(gameState);
 
             if (withCache && TryGetCachedScore(gameState, depth, ref alpha, ref beta, out var cachedScore))
                 return cachedScore;
 
             return player == maximazingPlayer
-                ? MaximizeScore(gameState, player, depth, alpha, beta)
-                : MinimizeScore(gameState, player, depth, alpha, beta);
+                ? MaximizeScore(gameState, player, depth, countdown, alpha, beta)
+                : MinimizeScore(gameState, player, depth, countdown, alpha, beta);
         }
 
         private bool TryGetCachedScore(Board gameState, int depth, ref double alpha, ref double beta, out double cachedScore)
@@ -101,14 +103,15 @@ namespace ConnectFourResearch.Solvers
             return false;
         }
 
-        private double MinimizeScore(Board gameState, Cell player, int depth, double alpha, double beta)
+        private double MinimizeScore(Board gameState, Cell player, int depth, Countdown countdown,
+            double alpha, double beta)
         {
             var type = CacheType.LowerBound;
             var score = double.PositiveInfinity;
             foreach (var move in gameState.GetPossibleMoves())
             {
                 var nextState = gameState.Move(move, player);
-                var nextStateScore = MiniMax(nextState, player.GetOpponent(), depth - 1, alpha, beta);
+                var nextStateScore = MiniMax(nextState, player.GetOpponent(), depth - 1, countdown, alpha, beta);
                 score = Math.Min(score, nextStateScore);
                 if (score < beta)
                 {
@@ -126,14 +129,15 @@ namespace ConnectFourResearch.Solvers
             return score;
         }
 
-        private double MaximizeScore(Board gameState, Cell player, int depth, double alpha, double beta)
+        private double MaximizeScore(Board gameState, Cell player, int depth, Countdown countdown,
+            double alpha, double beta)
         {
             var type = CacheType.UpperBound;
             var score = double.NegativeInfinity;
             foreach (var move in gameState.GetPossibleMoves())
             {
                 var nextState = gameState.Move(move, player);
-                var nextStateScore = MiniMax(nextState, player.GetOpponent(), depth - 1, alpha, beta);
+                var nextStateScore = MiniMax(nextState, player.GetOpponent(), depth - 1, countdown, alpha, beta);
                 score = Math.Max(score, nextStateScore);
                 if (score > alpha)
                 {
