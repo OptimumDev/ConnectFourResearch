@@ -18,7 +18,7 @@ namespace ConnectFourResearch.Tests
 
             foreach (var yellowSolverFabric in solverFabrics)
             {
-                log.Append($"\n| {GetSolverName(yellowSolverFabric)} |");
+                log.Append($"\n| {TestHelper.GetSolverName(yellowSolverFabric)} |");
                 foreach (var redSolverFabric in solverFabrics)
                 {
                     var result = Play(yellowSolverFabric, redSolverFabric);
@@ -33,9 +33,8 @@ namespace ConnectFourResearch.Tests
             TestHelper.SolverFabric yellowSolverFabric,
             TestHelper.SolverFabric redSolverFabric)
         {
-            const int maxDepth = Board.Width * Board.Height;
-            var yellowSolver = yellowSolverFabric(Cell.Yellow, maxDepth);
-            var redSolver = redSolverFabric(Cell.Red, maxDepth);
+            var yellowSolver = yellowSolverFabric(Cell.Yellow);
+            var redSolver = redSolverFabric(Cell.Red);
             var controller = new Controller(yellowSolver, redSolver, 100, null);
 
             var result = controller.Play();
@@ -50,7 +49,7 @@ namespace ConnectFourResearch.Tests
         {
             var log = new StringBuilder("Желтый \\ Красный |");
             foreach (var fabric in solverFabrics)
-                log.Append($" {GetSolverName(fabric)} |");
+                log.Append($" {TestHelper.GetSolverName(fabric)} |");
             log.Append("\n|");
             for (var i = 0; i < solverFabrics.Count + 1; i++)
                 log.Append(" --- |");
@@ -64,10 +63,5 @@ namespace ConnectFourResearch.Tests
             Cell.Empty => "Ничья",
             _ => throw new ArgumentException()
         };
-
-        private static string GetSolverName(TestHelper.SolverFabric fabric)
-        {
-            return fabric(Cell.Yellow, 0).Name;
-        }
     }
 }

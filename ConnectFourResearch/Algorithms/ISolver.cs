@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace ConnectFourResearch.Algorithms
@@ -13,5 +14,7 @@ namespace ConnectFourResearch.Algorithms
         IEnumerable<TSolution> GetSolutions(TProblem problem, Countdown countdown);
 
         string Name { get; }
+        
+        public event Action<int, Countdown> OnDepthHandled;
     }
 }

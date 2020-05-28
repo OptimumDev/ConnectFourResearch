@@ -14,6 +14,8 @@ namespace ConnectFourResearch.Solvers
         private readonly bool withSorting;
         private readonly Dictionary<Board, CacheValue> cache;
 
+        public event Action<int, Countdown> OnDepthHandled;
+
         public MiniMaxSolver(Cell maximazingPlayer, bool withSorting = false, bool withCache = false,
             int maxDepth = Board.Width * Board.Height)
         {
@@ -33,7 +35,10 @@ namespace ConnectFourResearch.Solvers
             {
                 var nextResult = Solve(problem, depth, countdown).ToList();
                 if (!countdown.IsFinished())
+                {
                     result = nextResult;
+                    OnDepthHandled?.Invoke(depth, countdown);
+                }
                 depth++;
             } while (!countdown.IsFinished() && depth <= maxDepth);
 

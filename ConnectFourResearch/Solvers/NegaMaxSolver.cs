@@ -11,6 +11,8 @@ namespace ConnectFourResearch.Solvers
         private readonly Cell me;
         private readonly int maxDepth;
 
+        public event Action<int, Countdown> OnDepthHandled;
+
         public NegaMaxSolver(Cell me, int maxDepth = Board.Width * Board.Height)
         {
             this.me = me;
@@ -26,7 +28,11 @@ namespace ConnectFourResearch.Solvers
             {
                 var nextResult = Solve(problem, depth, countdown).ToList();
                 if (!countdown.IsFinished())
+                {
                     result = nextResult;
+                    OnDepthHandled?.Invoke(depth, countdown);
+                }
+
                 depth++;
             } while (!countdown.IsFinished() && depth <= maxDepth);
 

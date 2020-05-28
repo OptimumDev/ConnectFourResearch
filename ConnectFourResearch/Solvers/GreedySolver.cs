@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using ConnectFourResearch.Algorithms;
@@ -40,5 +41,7 @@ namespace ConnectFourResearch.Solvers
             board.GetLinesCountOfLength(2, player) * 100;
 
         public string Name => "Greedy";
+
+        public event Action<int, Countdown> OnDepthHandled;
     }
 }

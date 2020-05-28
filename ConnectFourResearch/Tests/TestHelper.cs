@@ -7,7 +7,7 @@ namespace ConnectFourResearch.Tests
 {
     public static class TestHelper
     {
-        public delegate ISolver<Board, Move> SolverFabric(Cell player, int maxDepth);
+        public delegate ISolver<Board, Move> SolverFabric(Cell player, int maxDepth = 42);
 
         public static IEnumerable<SolverFabric> GetSolverFabrics()
         {
@@ -19,5 +19,10 @@ namespace ConnectFourResearch.Tests
         }
 
         public static bool IsWon(Board game, Cell player) => game.GetLinesCountOfLength(4, player) > 0;
+
+        public static string GetSolverName(SolverFabric fabric)
+        {
+            return fabric(Cell.Yellow, 0).Name;
+        }
     }
 }

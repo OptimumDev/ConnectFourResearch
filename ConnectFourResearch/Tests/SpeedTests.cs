@@ -3,6 +3,7 @@ using System.Linq;
 using ConnectFourResearch.Algorithms;
 using ConnectFourResearch.ConnectFour;
 using ConnectFourResearch.Solvers;
+using ConnectFourResearch.TestStats;
 using NUnit.Framework;
 
 namespace ConnectFourResearch.Tests

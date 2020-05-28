@@ -1,4 +1,4 @@
-namespace ConnectFourResearch.Tests
+namespace ConnectFourResearch.TestStats
 {
     public class TestStat
     {
