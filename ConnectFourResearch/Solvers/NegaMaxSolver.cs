@@ -12,6 +12,7 @@ namespace ConnectFourResearch.Solvers
         private readonly int maxDepth;
 
         public event Action<int, Countdown> OnDepthHandled;
+        public event Action<int> OnStateEvaluated;
 
         public NegaMaxSolver(Cell me, int maxDepth = Board.Width * Board.Height)
         {
@@ -44,13 +45,15 @@ namespace ConnectFourResearch.Solvers
             foreach (var possibleMove in problem.GetPossibleMoves())
             {
                 var nextState = problem.Move(possibleMove, me);
-                var score = -NegaMax(nextState, me.GetOpponent(), depth, countdown);
+                var score = -NegaMax(nextState, me.GetOpponent(), depth, countdown, depth);
                 yield return new Move(possibleMove, score);
             }
         }
 
-        private double NegaMax(Board gameState, Cell player, int depth, Countdown countdown)
+        private double NegaMax(Board gameState, Cell player, int depth, Countdown countdown, int initDepth)
         {
+            OnStateEvaluated?.Invoke(initDepth - depth);
+
             if (depth == 0 || gameState.IsFinished() || countdown.IsFinished())
                 return GetEstimateScore(gameState, player);
 
@@ -58,7 +61,7 @@ namespace ConnectFourResearch.Solvers
             foreach (var possibleMove in gameState.GetPossibleMoves())
             {
                 var child = gameState.Move(possibleMove, player);
-                value = Math.Max(value, -NegaMax(child, player.GetOpponent(), depth - 1, countdown));
+                value = Math.Max(value, -NegaMax(child, player.GetOpponent(), depth - 1, countdown, initDepth));
             }
             return value;
         }

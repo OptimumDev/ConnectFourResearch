@@ -43,5 +43,6 @@ namespace ConnectFourResearch.Solvers
         public string Name => "Greedy";
 
         public event Action<int, Countdown> OnDepthHandled;
+        public event Action<int> OnStateEvaluated;
     }
 }

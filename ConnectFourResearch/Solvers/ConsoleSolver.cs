@@ -41,5 +41,6 @@ namespace ConnectFourResearch.Solvers
         public string Name => "Console solver for human player";
 
         public event Action<int, Countdown> OnDepthHandled;
+        public event Action<int> OnStateEvaluated;
     }
 }

@@ -16,5 +16,7 @@ namespace ConnectFourResearch.Algorithms
         string Name { get; }
         
         public event Action<int, Countdown> OnDepthHandled;
+
+        public event Action<int> OnStateEvaluated;
     }
 }

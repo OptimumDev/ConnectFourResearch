@@ -15,6 +15,7 @@ namespace ConnectFourResearch.Solvers
         private readonly Dictionary<Board, CacheValue> cache;
 
         public event Action<int, Countdown> OnDepthHandled;
+        public event Action<int> OnStateEvaluated;
 
         public MiniMaxSolver(Cell maximazingPlayer, bool withSorting = false, bool withCache = false,
             int maxDepth = Board.Width * Board.Height)
@@ -58,13 +59,14 @@ namespace ConnectFourResearch.Solvers
         private Move EvaluateMove(Board gameState, int move, int depth, Countdown countdown)
         {
             var nextState = gameState.Move(move, maximazingPlayer);
-            var score = MiniMax(nextState, maximazingPlayer.GetOpponent(), depth, countdown);
+            var score = MiniMax(nextState, maximazingPlayer.GetOpponent(), depth, countdown, depth);
             return new Move(move, score);
         }
 
-        private double MiniMax(Board gameState, Cell player, int depth, Countdown countdown,
+        private double MiniMax(Board gameState, Cell player, int depth, Countdown countdown, int initDepth,
             double alpha = double.NegativeInfinity, double beta = double.PositiveInfinity)
         {
+            OnStateEvaluated?.Invoke(initDepth - depth);
             if (gameState.IsFinished() || depth == 0 || countdown.IsFinished())
                 return GetEstimateScore(gameState);
 
@@ -72,11 +74,12 @@ namespace ConnectFourResearch.Solvers
                 return cachedScore;
 
             return player == maximazingPlayer
-                ? MaximizeScore(gameState, player, depth, countdown, alpha, beta)
-                : MinimizeScore(gameState, player, depth, countdown, alpha, beta);
+                ? MaximizeScore(gameState, player, depth, countdown, initDepth, alpha, beta)
+                : MinimizeScore(gameState, player, depth, countdown, initDepth, alpha, beta);
         }
 
-        private bool TryGetCachedScore(Board gameState, int depth, ref double alpha, ref double beta, out double cachedScore)
+        private bool TryGetCachedScore(Board gameState, int depth, ref double alpha, ref double beta,
+            out double cachedScore)
         {
             cachedScore = double.NegativeInfinity;
 
@@ -109,14 +112,15 @@ namespace ConnectFourResearch.Solvers
         }
 
         private double MinimizeScore(Board gameState, Cell player, int depth, Countdown countdown,
-            double alpha, double beta)
+            int initDepth, double alpha, double beta)
         {
             var type = CacheType.LowerBound;
             var score = double.PositiveInfinity;
             foreach (var move in gameState.GetPossibleMoves())
             {
                 var nextState = gameState.Move(move, player);
-                var nextStateScore = MiniMax(nextState, player.GetOpponent(), depth - 1, countdown, alpha, beta);
+                var nextStateScore = MiniMax(nextState, player.GetOpponent(), depth - 1,
+                    countdown, initDepth, alpha, beta);
                 score = Math.Min(score, nextStateScore);
                 if (score < beta)
                 {
@@ -129,20 +133,22 @@ namespace ConnectFourResearch.Solvers
                     break;
                 }
             }
+
             if (withCache)
                 cache[gameState] = new CacheValue(score, depth, type);
             return score;
         }
 
         private double MaximizeScore(Board gameState, Cell player, int depth, Countdown countdown,
-            double alpha, double beta)
+            int initDepth, double alpha, double beta)
         {
             var type = CacheType.UpperBound;
             var score = double.NegativeInfinity;
             foreach (var move in gameState.GetPossibleMoves())
             {
                 var nextState = gameState.Move(move, player);
-                var nextStateScore = MiniMax(nextState, player.GetOpponent(), depth - 1, countdown, alpha, beta);
+                var nextStateScore = MiniMax(nextState, player.GetOpponent(), depth - 1,
+                    countdown, initDepth, alpha, beta);
                 score = Math.Max(score, nextStateScore);
                 if (score > alpha)
                 {
@@ -155,6 +161,7 @@ namespace ConnectFourResearch.Solvers
                     break;
                 }
             }
+
             if (withCache)
                 cache[gameState] = new CacheValue(score, depth, type);
             return score;
